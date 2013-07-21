@@ -1,5 +1,7 @@
 package dyagmin.greppage;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JFrame;
@@ -10,7 +12,7 @@ import javax.swing.SwingUtilities;
 
 public class GreppageWindow extends JFrame {
 
-
+    private static GreppageWindow instance;
 
     public static void load() {
 
@@ -18,10 +20,16 @@ public class GreppageWindow extends JFrame {
 
             @Override
             public void run() {
-                GreppageWindow window = new GreppageWindow();
+                GreppageWindow.instance = new GreppageWindow();
             }
 
         });
+
+    }
+
+    public static GreppageWindow getInstance() {
+
+        return GreppageWindow.instance;
 
     }
 
@@ -39,14 +47,39 @@ public class GreppageWindow extends JFrame {
         JMenuItem newSearchMenuItem = new JMenuItem("New Search");
         newSearchMenuItem.setMnemonic(KeyEvent.VK_N);
         menu.add(newSearchMenuItem);
+        newSearchMenuItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NewSearchDialog newSearchDialog = new NewSearchDialog(GreppageWindow.getInstance());
+            }
+
+        });
 
         JMenuItem saveResultsMenuItem = new JMenuItem("Save Search Results");
         saveResultsMenuItem.setMnemonic(KeyEvent.VK_S);
+        saveResultsMenuItem.setEnabled(false);
         menu.add(saveResultsMenuItem);
+        saveResultsMenuItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // save dialog
+            }
+
+        });
 
         JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.setMnemonic(KeyEvent.VK_X);
         menu.add(exitMenuItem);
+        exitMenuItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+
+        });
 
         menuBar.add(menu);
 
