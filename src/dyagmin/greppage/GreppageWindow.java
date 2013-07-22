@@ -8,11 +8,14 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 public class GreppageWindow extends JFrame {
 
     private static GreppageWindow instance;
+    private JTabbedPane tabbedPane;
 
     public static void load() {
 
@@ -28,9 +31,7 @@ public class GreppageWindow extends JFrame {
     }
 
     public static GreppageWindow getInstance() {
-
         return GreppageWindow.instance;
-
     }
 
     private GreppageWindow() {
@@ -64,7 +65,7 @@ public class GreppageWindow extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // save dialog
+                // TODO save dialog
             }
 
         });
@@ -82,9 +83,13 @@ public class GreppageWindow extends JFrame {
         });
 
         menuBar.add(menu);
-
         this.setJMenuBar(menuBar);
+        this.tabbedPane = new JTabbedPane();
+        this.add(tabbedPane);
+    }
 
+    public void addTab(String title, GreppagePanel panel) {
+        this.tabbedPane.addTab(title, panel);
     }
 
 }

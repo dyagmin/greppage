@@ -29,7 +29,6 @@ public class NewSearchDialog extends JDialog {
     private JCheckBox useRegularExpressionCheckBox;
 
     private void add(JComponent comp, int x, int y, int fill) {
-
         Container contentPane = this.getRootPane().getContentPane();
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = fill;
@@ -42,9 +41,7 @@ public class NewSearchDialog extends JDialog {
     }
 
     private void add(JComponent comp, int x, int y) {
-
         this.add(comp, x, y, GridBagConstraints.NONE);
-
     }
 
     public NewSearchDialog(GreppageWindow owner) {
@@ -94,31 +91,22 @@ public class NewSearchDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 NewSearchDialog.this.searchPathErrorLabel.setText("");
                 NewSearchDialog.this.searchStringErrorLabel.setText("");
-
                 if(NewSearchDialog.this.searchPathTextField.getText().length() == 0){
                     NewSearchDialog.this.searchPathErrorLabel.setText("Search path cannot be empty.");
-
                 } else if(NewSearchDialog.this.searchStringTextField.getText().length() == 0) {
                     NewSearchDialog.this.searchStringErrorLabel.setText("Search string cannot be empty.");
-
                 } else {
-
                     File searchPath = new File(NewSearchDialog.this.searchPathTextField.getText());
                     if(searchPath.exists()) {
-                        // TODO open tab in parent
+                        new GreppagePanel(searchPath, NewSearchDialog.this.searchStringTextField.getText(), NewSearchDialog.this.includeSubDirectoriesCheckBox.isSelected(), NewSearchDialog.this.useRegularExpressionCheckBox.isSelected());
                         NewSearchDialog.this.dispose();
-                        
                     } else {
                         NewSearchDialog.this.searchPathErrorLabel.setText("Search path not found.");
                     }
-
                 }
-                
             }
-
         });
 
         this.pack();
