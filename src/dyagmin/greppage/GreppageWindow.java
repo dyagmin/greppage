@@ -4,6 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -15,10 +20,10 @@ import javax.swing.SwingUtilities;
 public class GreppageWindow extends JFrame {
 
     private static GreppageWindow instance;
-    private JTabbedPane tabbedPane;
+    public JTabbedPane tabbedPane;
+    private JMenuItem saveResultsMenuItem;
 
     public static void load() {
-
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
@@ -27,7 +32,6 @@ public class GreppageWindow extends JFrame {
             }
 
         });
-
     }
 
     public static GreppageWindow getInstance() {
@@ -57,19 +61,6 @@ public class GreppageWindow extends JFrame {
 
         });
 
-        JMenuItem saveResultsMenuItem = new JMenuItem("Save Search Results");
-        saveResultsMenuItem.setMnemonic(KeyEvent.VK_S);
-        saveResultsMenuItem.setEnabled(false);
-        menu.add(saveResultsMenuItem);
-        saveResultsMenuItem.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO save dialog
-            }
-
-        });
-
         JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.setMnemonic(KeyEvent.VK_X);
         menu.add(exitMenuItem);
@@ -85,11 +76,8 @@ public class GreppageWindow extends JFrame {
         menuBar.add(menu);
         this.setJMenuBar(menuBar);
         this.tabbedPane = new JTabbedPane();
-        this.add(tabbedPane);
-    }
+        this.add(this.tabbedPane);
 
-    public void addTab(String title, GreppagePanel panel) {
-        this.tabbedPane.addTab(title, panel);
     }
 
 }

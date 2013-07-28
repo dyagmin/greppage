@@ -3,6 +3,7 @@ package dyagmin.greppage;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -10,11 +11,11 @@ class GreppageTableModel extends AbstractTableModel {
 
     private String[] columnNames = {"Line Number", "Line", "File"};
     private ArrayList<String[]> data = new ArrayList<String[]>();
+    public GreppageThread thread;
 
-    public GreppageTableModel(File searchPath, String searchString, boolean includeSubDirectories, boolean useRegularExpression) {
+    public GreppageTableModel(File searchPath, Map optionMap) {
         super();
-        GreppageThread thread = new GreppageThread(this, searchPath, searchString, includeSubDirectories, useRegularExpression);
-        thread.start();
+        this.thread = new GreppageThread(this, searchPath, optionMap);
     }
 
     public int getColumnCount() {

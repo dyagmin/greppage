@@ -1,5 +1,6 @@
 package dyagmin.greppage;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dialog;
@@ -11,12 +12,17 @@ import java.awt.GridBagConstraints;
 
 import java.io.File;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 
 public class NewSearchDialog extends JDialog {
@@ -37,7 +43,6 @@ public class NewSearchDialog extends JDialog {
         constraints.gridx = x;
         constraints.gridy = y;
         contentPane.add(comp, constraints);
-
     }
 
     private void add(JComponent comp, int x, int y) {
@@ -100,7 +105,11 @@ public class NewSearchDialog extends JDialog {
                 } else {
                     File searchPath = new File(NewSearchDialog.this.searchPathTextField.getText());
                     if(searchPath.exists()) {
-                        new GreppagePanel(searchPath, NewSearchDialog.this.searchStringTextField.getText(), NewSearchDialog.this.includeSubDirectoriesCheckBox.isSelected(), NewSearchDialog.this.useRegularExpressionCheckBox.isSelected());
+                        Map optionMap = new HashMap();
+                        optionMap.put("searchString", NewSearchDialog.this.searchStringTextField.getText());
+                        optionMap.put("includeSubDirectories", NewSearchDialog.this.includeSubDirectoriesCheckBox.isSelected());
+                        optionMap.put("useRegularExpression", NewSearchDialog.this.useRegularExpressionCheckBox.isSelected());
+                        new GreppageTabPanel(searchPath, optionMap);
                         NewSearchDialog.this.dispose();
                     } else {
                         NewSearchDialog.this.searchPathErrorLabel.setText("Search path not found.");
