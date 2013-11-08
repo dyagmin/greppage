@@ -19,8 +19,8 @@ import javax.swing.JTable;
 
 class GreppageTabPanel extends JPanel implements ThreadListener {
 
-    private JButton saveButton;
-    private JLabel statusLabel;
+    private JButton mSaveButton;
+    private JLabel mStatusLabel;
 
     public GreppageTabPanel(File searchPath, Map optionMap) {
         super();
@@ -49,25 +49,25 @@ class GreppageTabPanel extends JPanel implements ThreadListener {
         scrollPaneConstraints.gridy = 1;
         this.add(scrollPane, scrollPaneConstraints);
 
-        this.statusLabel = new JLabel();
+        this.mStatusLabel = new JLabel();
         GridBagConstraints statusLabelConstraints = new GridBagConstraints();
         statusLabelConstraints.fill = GridBagConstraints.NONE;
         statusLabelConstraints.weightx = 0.5;
         statusLabelConstraints.weighty = 0.1;
         statusLabelConstraints.gridx = 0;
         statusLabelConstraints.gridy = 2;
-        this.add(this.statusLabel, statusLabelConstraints);
+        this.add(this.mStatusLabel, statusLabelConstraints);
 
-        this.saveButton = new JButton("Save");
-        this.saveButton.setEnabled(false);
+        this.mSaveButton = new JButton("Save");
+        this.mSaveButton.setEnabled(false);
         GridBagConstraints saveButtonConstraints = new GridBagConstraints();
         saveButtonConstraints.fill = GridBagConstraints.NONE;
         saveButtonConstraints.weightx = 0.5;
         saveButtonConstraints.weighty = 0.1;
         saveButtonConstraints.gridx = 0;
         saveButtonConstraints.gridy = 3;
-        this.add(this.saveButton, saveButtonConstraints);
-        this.saveButton.addActionListener(new ActionListener() {
+        this.add(this.mSaveButton, saveButtonConstraints);
+        this.mSaveButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -76,16 +76,17 @@ class GreppageTabPanel extends JPanel implements ThreadListener {
 
         });
 
+        // TODO Maybe this should be in a post(new Runnable()) thing
         model.thread.addListener(this);
         model.thread.start();
     }
 
     public void update(String s) {
-        this.statusLabel.setText(s);
+        this.mStatusLabel.setText(s);
     }
 
     public void complete() {
-        this.saveButton.setEnabled(true);
+        this.mSaveButton.setEnabled(true);
     }
 
 }

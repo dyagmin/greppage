@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,12 +28,13 @@ import javax.swing.JTextField;
 
 public class NewSearchDialog extends JDialog {
 
-    private JTextField searchPathTextField;
-    private JLabel searchPathErrorLabel;
-    private JTextField searchStringTextField;
-    private JLabel searchStringErrorLabel;
-    private JCheckBox includeSubDirectoriesCheckBox;
-    private JCheckBox useRegularExpressionCheckBox;
+    private JTextField mSearchPathTextField;
+    private JLabel mSearchPathErrorLabel;
+    private JTextField mSearchStringTextField;
+    private JLabel mSearchStringErrorLabel;
+    private JCheckBox mIncludeSubDirectoriesCheckBox;
+    private JCheckBox mUseRegularExpressionCheckBox;
+    private File mSearchPath;
 
     private void add(JComponent comp, int x, int y, int fill) {
         Container contentPane = this.getRootPane().getContentPane();
@@ -61,34 +63,53 @@ public class NewSearchDialog extends JDialog {
         JLabel searchPathLabel = new JLabel("Search Path:");
         this.add(searchPathLabel, 0, 0);
 
-        this.searchPathTextField = new JTextField("", 15);
-        this.add(this.searchPathTextField, 1, 0, GridBagConstraints.HORIZONTAL);
+        this.mSearchPathTextField = new JTextField("", 15);
+        this.add(this.mSearchPathTextField, 1, 0, GridBagConstraints.HORIZONTAL);
 
-        this.searchPathErrorLabel = new JLabel("");
-        this.searchPathErrorLabel.setForeground(Color.RED);
-        this.add(this.searchPathErrorLabel, 1, 1);
+        this.mSearchPathErrorLabel = new JLabel("");
+        this.mSearchPathErrorLabel.setForeground(Color.RED);
+        this.add(this.mSearchPathErrorLabel, 1, 1);
+
+        JButton searchFileChooser = new JButton("Select Directory");
+        this.add(searchFileChooser, 2, 0);
+        searchFileChooser.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e){
+                JFileChooser chooser = new JFileChooser();
+                chooser.setCurrentDirectory(new java.io.File("."));
+                chooser.setDialogTitle("Select a folder");
+                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                chooser.setAcceptAllFileFilterUsed(false);
+                if(chooser.showOpenDialog(NewSearchDialog.this) == JFileChooser.APPROVE_OPTION) {
+                    NewSearchDialog.this.mSearchPath = chooser.getCurrentDirectory();
+                    NewSearchDialog.this.mSearchPathTextField.setText(NewSearchDialog.this.mSearchPath.getPath());
+                }
+            }
+
+        });
 
         JLabel searchStringLabel = new JLabel("Search String:");
         this.add(searchStringLabel, 0, 2);
 
-        this.searchStringTextField = new JTextField("", 15);
-        this.add(this.searchStringTextField, 1, 2, GridBagConstraints.HORIZONTAL);
+        this.mSearchStringTextField = new JTextField("", 15);
+        this.add(this.mSearchStringTextField, 1, 2, GridBagConstraints.HORIZONTAL);
 
-        this.searchStringErrorLabel = new JLabel("");
-        this.searchStringErrorLabel.setForeground(Color.RED);
-        this.add(this.searchStringErrorLabel, 1, 3);
+        this.mSearchStringErrorLabel = new JLabel("");
+        this.mSearchStringErrorLabel.setForeground(Color.RED);
+        this.add(this.mSearchStringErrorLabel, 1, 3);
 
         JLabel includeSubDirectoriesLabel = new JLabel("Include Subdirectories:");
         this.add(includeSubDirectoriesLabel, 0, 4);
 
-        this.includeSubDirectoriesCheckBox = new JCheckBox();
-        this.add(this.includeSubDirectoriesCheckBox, 1, 4);
+        this.mIncludeSubDirectoriesCheckBox = new JCheckBox();
+        this.add(this.mIncludeSubDirectoriesCheckBox, 1, 4);
 
         JLabel useRegularExpressionLabel = new JLabel("Use Regular Expressions:");
         this.add(useRegularExpressionLabel, 0, 5);
 
-        this.useRegularExpressionCheckBox = new JCheckBox();
-        this.add(this.useRegularExpressionCheckBox, 1, 5);
+        this.mUseRegularExpressionCheckBox = new JCheckBox();
+        this.add(this.mUseRegularExpressionCheckBox, 1, 5);
 
         JButton newSearchButton = new JButton("Search");
         this.add(newSearchButton, 1, 6);
@@ -96,23 +117,22 @@ public class NewSearchDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                NewSearchDialog.this.searchPathErrorLabel.setText("");
-                NewSearchDialog.this.searchStringErrorLabel.setText("");
-                if(NewSearchDialog.this.searchPathTextField.getText().length() == 0){
-                    NewSearchDialog.this.searchPathErrorLabel.setText("Search path cannot be empty.");
-                } else if(NewSearchDialog.this.searchStringTextField.getText().length() == 0) {
-                    NewSearchDialog.this.searchStringErrorLabel.setText("Search string cannot be empty.");
+                NewSearchDialog.this.mSearchPathErrorLabel.setText("");
+                NewSearchDialog.this.mSearchStringErrorLabel.setText("");
+                if(NewSearchDialog.this.mSearchPathTextField.getText().length() == 0){
+                    NewSearchDialog.this.mSearchPathErrorLabel.setText("Search path cannot be empty.");
+                } else if(NewSearchDialog.this.mSearchStringTextField.getText().length() == 0) {
+                    NewSearchDialog.this.mSearchStringErrorLabel.setText("Search string cannot be empty.");
                 } else {
-                    File searchPath = new File(NewSearchDialog.this.searchPathTextField.getText());
-                    if(searchPath.exists()) {
+                    if(NewSearchDialog.this.mSearchPath.exists()) {
                         Map optionMap = new HashMap();
-                        optionMap.put("searchString", NewSearchDialog.this.searchStringTextField.getText());
-                        optionMap.put("includeSubDirectories", NewSearchDialog.this.includeSubDirectoriesCheckBox.isSelected());
-                        optionMap.put("useRegularExpression", NewSearchDialog.this.useRegularExpressionCheckBox.isSelected());
-                        new GreppageTabPanel(searchPath, optionMap);
+                        optionMap.put("searchString", NewSearchDialog.this.mSearchStringTextField.getText());
+                        optionMap.put("includeSubDirectories", NewSearchDialog.this.mIncludeSubDirectoriesCheckBox.isSelected());
+                        optionMap.put("useRegularExpression", NewSearchDialog.this.mUseRegularExpressionCheckBox.isSelected());
+                        new GreppageTabPanel(NewSearchDialog.this.mSearchPath, optionMap);
                         NewSearchDialog.this.dispose();
                     } else {
-                        NewSearchDialog.this.searchPathErrorLabel.setText("Search path not found.");
+                        NewSearchDialog.this.mSearchPathErrorLabel.setText("Search path not found.");
                     }
                 }
             }
