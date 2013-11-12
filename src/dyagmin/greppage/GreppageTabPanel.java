@@ -10,6 +10,7 @@ import java.io.File;
 import java.lang.Thread;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,10 +22,22 @@ class GreppageTabPanel extends JPanel implements ThreadListener {
 
     private JButton mSaveButton;
     private JLabel mStatusLabel;
+    private int mFilesSearched = 0;
+    private int mFilesTotal = 0;
+    private String mCurrentFile;
+    private String STATUS_TEXT = "Searched %d out of %d files. Currently searching: %s";
 
     public GreppageTabPanel(File searchPath, Map optionMap) {
         super();
         GreppageWindow window = GreppageWindow.getInstance();
+        String searchString;
+        if(optionMap.containsKey("searchString")) {
+            searchString = (String) optionMap.get("searchString");
+        } else {
+            searchString = ((Pattern) optionMap.get("searchPattern")).toString();
+        }
+
+
         String title = (String) optionMap.get("searchString") + " (" + String.valueOf(window.tabbedPane.getTabCount() + ")");
         window.tabbedPane.addTab(title, this);
         this.setLayout(new GridBagLayout());
@@ -81,11 +94,27 @@ class GreppageTabPanel extends JPanel implements ThreadListener {
         model.thread.start();
     }
 
-    public void update(String s) {
-        this.mStatusLabel.setText(s);
+    private void updateStatusLabel() {
+        this.mStatusLabel.setText(String.format(this.STATUS_TEXT, this.mFilesSearched, this.mFilesTotal, this.mCurrentFile));
+    }
+
+    public void setCurrentFile(String currentFile) {
+        this.mCurrentFile = currentFile;
+        this.updateStatusLabel();
+    }
+
+    public void incrementFilesSearched() {
+        this.mFilesSearched++;
+        this.updateStatusLabel();
+    }
+
+    public void increaseFilesTotal(int i) {
+        this.mFilesTotal = this.mFilesTotal + i;
+        this.updateStatusLabel();
     }
 
     public void complete() {
+        this.mStatusLabel.setText(String.format("Done searching %d out of %d files.", this.mFilesSearched, this.mFilesTotal));
         this.mSaveButton.setEnabled(true);
     }
 

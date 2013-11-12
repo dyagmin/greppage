@@ -12,6 +12,8 @@ import java.awt.GridBagConstraints;
 
 import java.io.File;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -126,10 +128,20 @@ public class NewSearchDialog extends JDialog {
                 } else {
                     if(NewSearchDialog.this.mSearchPath.exists()) {
                         Map optionMap = new HashMap();
-                        optionMap.put("searchString", NewSearchDialog.this.mSearchStringTextField.getText());
+                        String searchString = NewSearchDialog.this.mSearchStringTextField.getText();
                         optionMap.put("includeSubDirectories", NewSearchDialog.this.mIncludeSubDirectoriesCheckBox.isSelected());
-                        optionMap.put("useRegularExpression", NewSearchDialog.this.mUseRegularExpressionCheckBox.isSelected());
-                        new GreppageTabPanel(NewSearchDialog.this.mSearchPath, optionMap);
+                        if(NewSearchDialog.this.mUseRegularExpressionCheckBox.isSelected()) {
+                            try {
+                                Pattern searchPattern = Pattern.compile(searchString);
+                                optionMap.put("searchPattern", searchPattern);
+                                new GreppageTabPanel(NewSearchDialog.this.mSearchPath, optionMap);
+                            } catch(PatternSyntaxException patternException) {
+                                NewSearchDialog.this.mSearchPathErrorLabel.setText("Invalid regular expression.");
+                            }
+                        } else {
+                            optionMap.put("searchString", searchString);
+                            new GreppageTabPanel(NewSearchDialog.this.mSearchPath, optionMap);
+                        }
                         NewSearchDialog.this.dispose();
                     } else {
                         NewSearchDialog.this.mSearchPathErrorLabel.setText("Search path not found.");
