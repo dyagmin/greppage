@@ -1,4 +1,4 @@
-package dyagmin.greppage;
+package com.danielyagmin.greppage.model;
 
 import java.io.File;
 
@@ -7,15 +7,13 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-class GreppageTableModel extends AbstractTableModel {
+public class ResultTableModel extends AbstractTableModel {
 
     private String[] columnNames = {"Line Number", "Line", "File"};
     private ArrayList<String[]> data = new ArrayList<String[]>();
-    public GreppageThread thread;
 
-    public GreppageTableModel(File searchPath, Map optionMap) {
+    public ResultTableModel() {
         super();
-        this.thread = new GreppageThread(this, searchPath, optionMap);
     }
 
     public int getColumnCount() {

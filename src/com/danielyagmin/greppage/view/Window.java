@@ -1,4 +1,4 @@
-package dyagmin.greppage;
+package com.danielyagmin.greppage.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,10 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-public class GreppageWindow extends JFrame {
+public class Window extends JFrame {
 
-    private static GreppageWindow instance;
-    public JTabbedPane tabbedPane;
+    public JTabbedPane mMainTabbedPane;
     private JMenuItem saveResultsMenuItem;
 
     public static void load() {
@@ -28,40 +27,43 @@ public class GreppageWindow extends JFrame {
 
             @Override
             public void run() {
-                GreppageWindow.instance = new GreppageWindow();
+                new Window();
             }
 
         });
     }
 
-    public static GreppageWindow getInstance() {
-        return GreppageWindow.instance;
+    private Window() {
+        super();
+        this.initialize();
     }
 
-    private GreppageWindow() {
-
-        super();
+    private void initialize() {
         this.setVisible(true);
         this.setTitle("Greppage");
         this.setSize(600, 400);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.initializeMenu();
+        this.mMainTabbedPane = new JTabbedPane();
+        this.add(this.mMainTabbedPane);
+    }
 
+    private void initializeMenu() {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Greppage");
-        
         JMenuItem newSearchMenuItem = new JMenuItem("New Search");
+        JMenuItem exitMenuItem = new JMenuItem("Exit");
         newSearchMenuItem.setMnemonic(KeyEvent.VK_N);
         menu.add(newSearchMenuItem);
         newSearchMenuItem.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                NewSearchDialog newSearchDialog = new NewSearchDialog(GreppageWindow.getInstance());
+                new NewSearchDialog(Window.this);
             }
 
         });
 
-        JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.setMnemonic(KeyEvent.VK_X);
         menu.add(exitMenuItem);
         exitMenuItem.addActionListener(new ActionListener() {
@@ -75,9 +77,6 @@ public class GreppageWindow extends JFrame {
 
         menuBar.add(menu);
         this.setJMenuBar(menuBar);
-        this.tabbedPane = new JTabbedPane();
-        this.add(this.tabbedPane);
-
     }
 
 }

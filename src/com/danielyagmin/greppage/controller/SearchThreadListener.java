@@ -1,6 +1,6 @@
-package dyagmin.greppage;
+package com.danielyagmin.greppage.controller;
 
-public interface ThreadListener {
+public interface SearchThreadListener {
     
     public void setCurrentFile(String currentfile);
 

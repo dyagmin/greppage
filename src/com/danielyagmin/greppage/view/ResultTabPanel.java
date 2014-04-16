@@ -1,4 +1,4 @@
-package dyagmin.greppage;
+package com.danielyagmin.greppage.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,8 +17,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JFileChooser;
 
-class GreppageTabPanel extends JPanel implements ThreadListener {
+import com.danielyagmin.greppage.controller.SearchThreadListener;
+import com.danielyagmin.greppage.controller.SearchThread;
+import com.danielyagmin.greppage.model.ResultTableModel;
+
+class ResultTabPanel extends JPanel implements SearchThreadListener {
 
     private JButton mSaveButton;
     private JLabel mStatusLabel;
@@ -27,9 +32,8 @@ class GreppageTabPanel extends JPanel implements ThreadListener {
     private String mCurrentFile;
     private String STATUS_TEXT = "Searched %d out of %d files. Currently searching: %s";
 
-    public GreppageTabPanel(File searchPath, Map optionMap) {
+    public ResultTabPanel(Window window, File searchPath, Map optionMap) {
         super();
-        GreppageWindow window = GreppageWindow.getInstance();
         String searchString;
         if(optionMap.containsKey("searchString")) {
             searchString = (String) optionMap.get("searchString");
@@ -37,9 +41,8 @@ class GreppageTabPanel extends JPanel implements ThreadListener {
             searchString = ((Pattern) optionMap.get("searchPattern")).toString();
         }
 
-
-        String title = (String) optionMap.get("searchString") + " (" + String.valueOf(window.tabbedPane.getTabCount() + ")");
-        window.tabbedPane.addTab(title, this);
+        String title = (String) optionMap.get("searchString") + " (" + String.valueOf(window.mMainTabbedPane.getTabCount() + ")");
+        window.mMainTabbedPane.addTab(title, this);
         this.setLayout(new GridBagLayout());
 
         JLabel summaryLabel = new JLabel("Searching for " + (String) optionMap.get("searchString") + " in " + searchPath.getAbsolutePath());
@@ -51,7 +54,7 @@ class GreppageTabPanel extends JPanel implements ThreadListener {
         summaryLabelConstraints.gridy = 0;
         this.add(summaryLabel, summaryLabelConstraints);
 
-        GreppageTableModel model = new GreppageTableModel(searchPath, optionMap);
+        ResultTableModel model = new ResultTableModel();
         JTable table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
         GridBagConstraints scrollPaneConstraints = new GridBagConstraints();
@@ -84,14 +87,16 @@ class GreppageTabPanel extends JPanel implements ThreadListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO Save
+                JFileChooser fileChooser = new JFileChooser();
+                if(fileChooser.showSaveDialog(ResultTabPanel.this) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    // write to file
+                }
             }
 
         });
-
-        // TODO Maybe this should be in a post(new Runnable()) thing
-        model.thread.addListener(this);
-        model.thread.start();
+        SearchThread thread = new SearchThread(this, model, searchPath, optionMap);
+        thread.start();
     }
 
     private void updateStatusLabel() {

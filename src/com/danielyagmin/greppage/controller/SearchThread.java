@@ -1,4 +1,4 @@
-package dyagmin.greppage;
+package com.danielyagmin.greppage.controller;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-class GreppageThread extends Thread {
+import com.danielyagmin.greppage.model.ResultTableModel;
+
+public class SearchThread extends Thread {
 
     private File mRootPath;
     private String mSearchString;
@@ -21,35 +23,24 @@ class GreppageThread extends Thread {
     private boolean mIncludeSubDirectories;
     private boolean mUseRegularExpression;
     private boolean mHasAllFiles;
-    private List<ThreadListener> mListeners;
+    private SearchThreadListener mListener;
     private List<File> mFilesQueue;
-    private GreppageTableModel mGreppageTableModel;
+    private ResultTableModel mResultTableModel;
 
-    public GreppageThread(GreppageTableModel model, File searchPath, Map optionMap) {
+    public SearchThread(SearchThreadListener listener, ResultTableModel model, File searchPath, Map optionMap) {
         super();
-        this.mListeners = new ArrayList<ThreadListener>();
+        this.mListener = listener;
         this.mFilesQueue = new ArrayList<File>();
-        this.mGreppageTableModel = model;
+        this.mResultTableModel = model;
         this.mRootPath = searchPath;
-        this.mIncludeSubDirectories = (Boolean) optionMap.get("includeSubDirectories"); // TODO Implement
-        this.mUseRegularExpression = optionMap.containsKey("searchPattern");
-        if(this.mUseRegularExpression) {
-            this.mSearchPattern = (Pattern) optionMap.get("searchPattern");
-        } else {
-            this.mSearchString = (String) optionMap.get("searchString");
-        }
-    }
-
-    public void addListener(ThreadListener tl) {
-        this.mListeners.add(tl);
+        this.mIncludeSubDirectories = (Boolean) optionMap.get("includeSubDirectories");
+        this.mSearchPattern = (Pattern) optionMap.get("searchPattern");
     }
 
     public void run() {
         this.queueFile(this.mRootPath, true);
         this.dequeue();
-        for(ThreadListener tl: this.mListeners) {
-            tl.complete();
-        }
+        this.mListener.complete();
     }
 
     private void dequeue() {
@@ -58,14 +49,10 @@ class GreppageThread extends Thread {
 
     private void dequeue(int max) {
         for(int i = 0; i < max; i++) {
-            for(ThreadListener tl: this.mListeners) {
-                tl.setCurrentFile(this.mFilesQueue.get(0).getAbsolutePath());
-            }
+            this.mListener.setCurrentFile(this.mFilesQueue.get(0).getAbsolutePath());
             this.getInstances(this.mFilesQueue.get(0));
             this.mFilesQueue.remove(0);
-            for(ThreadListener tl: this.mListeners) {
-                tl.incrementFilesSearched();
-            }
+            this.mListener.incrementFilesSearched();
         }
     }
 
@@ -82,9 +69,7 @@ class GreppageThread extends Thread {
             }
         } else {
             this.mFilesQueue.add(file);
-            for(ThreadListener tl: this.mListeners) {
-                tl.increaseFilesTotal(1);
-            }
+            this.mListener.increaseFilesTotal(1);
         }
     }
 
@@ -96,16 +81,9 @@ class GreppageThread extends Thread {
             br = new BufferedReader(new FileReader(file));
             while((currentLine = br.readLine()) != null) {
                 lineNumber++;
-                if(this.mUseRegularExpression) {
-                    if(this.mSearchPattern.matcher(currentLine).find()) {
-                        String[] row = {String.valueOf(lineNumber), currentLine.trim(), file.getAbsolutePath()};
-                        this.mGreppageTableModel.addRow(row);
-                    }
-                } else {
-                    if(currentLine.contains(this.mSearchString)) {
-                        String[] row = {String.valueOf(lineNumber), currentLine.trim(), file.getAbsolutePath()};
-                        this.mGreppageTableModel.addRow(row);
-                    }
+                if(this.mSearchPattern.matcher(currentLine).find()) {
+                    String[] row = {String.valueOf(lineNumber), currentLine.trim(), file.getAbsolutePath()};
+                    this.mResultTableModel.addRow(row);
                 }
             }
         } catch(FileNotFoundException e) {
