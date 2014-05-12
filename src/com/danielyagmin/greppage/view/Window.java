@@ -15,68 +15,54 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
+
+
 
 public class Window extends JFrame {
 
-    public JTabbedPane mMainTabbedPane;
-    private JMenuItem saveResultsMenuItem;
+    private JTabbedPane mMainTabbedPane;
+    private JMenuItem mExitMenuItem = new JMenuItem("Exit");
+    private JMenuItem mSaveResultsMenuItem = new JMenuItem("New Search");
+    private JMenuItem mNewSearchMenuItem = new JMenuItem("New Search");
 
-    public static void load() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                new Window();
-            }
-
-        });
+    public Window() {
+        super();
+        initialize();
     }
 
-    private Window() {
-        super();
-        this.initialize();
+    public void addExitListener(ActionListener al) {
+        mExitMenuItem.addActionListener(al);
+    }
+
+    public void addNewSearchButtonListener(ActionListener al) {
+        mNewSearchMenuItem.addActionListener(al);
+    }
+
+    public void addResultTabPanel(ResultTabPanel panel) {
+        mMainTabbedPane.addTab(panel.getTitle(), panel);
     }
 
     private void initialize() {
-        this.setVisible(true);
-        this.setTitle("Greppage");
-        this.setSize(600, 400);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.initializeMenu();
-        this.mMainTabbedPane = new JTabbedPane();
-        this.add(this.mMainTabbedPane);
+        setTitle("Greppage");
+        setSize(600, 400);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        initializeMenu();
+        mMainTabbedPane = new JTabbedPane();
+        add(mMainTabbedPane);
+        setVisible(true);
     }
 
     private void initializeMenu() {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Greppage");
-        JMenuItem newSearchMenuItem = new JMenuItem("New Search");
-        JMenuItem exitMenuItem = new JMenuItem("Exit");
-        newSearchMenuItem.setMnemonic(KeyEvent.VK_N);
-        menu.add(newSearchMenuItem);
-        newSearchMenuItem.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new NewSearchDialog(Window.this);
-            }
+        mNewSearchMenuItem.setMnemonic(KeyEvent.VK_N);
+        mExitMenuItem.setMnemonic(KeyEvent.VK_X);
 
-        });
-
-        exitMenuItem.setMnemonic(KeyEvent.VK_X);
-        menu.add(exitMenuItem);
-        exitMenuItem.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-
-        });
-
+        menu.add(mNewSearchMenuItem);
+        menu.add(mExitMenuItem);
         menuBar.add(menu);
-        this.setJMenuBar(menuBar);
+        setJMenuBar(menuBar);
     }
 
 }

@@ -22,6 +22,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,165 +34,170 @@ import javax.swing.event.DocumentListener;
 
 public class NewSearchDialog extends JDialog {
 
-    private JTextField mSearchPathTextField;
-    private JLabel mSearchPathErrorLabel;
-    private JTextField mSearchStringTextField;
-    private JLabel mSearchStringErrorLabel;
+    private JTextField mRootDirectoryTextField;
+    private JLabel mRootDirectoryErrorLabel = new JLabel("");
+    private JTextField mSearchPatternTextField;
+    private JTextField mFileExtensionsAllowedTextField;
+    private JButton mStartSearchButton = new JButton("Search");
+    private JLabel mSearchPatternErrorLabel = new JLabel("");
     private JCheckBox mIncludeSubDirectoriesCheckBox;
-    private JCheckBox mUseRegularExpressionCheckBox;
     private JCheckBox mCaseInsensitiveCheckBox;
-    private File mSearchPath;
     private Window mWindow;
+    private JButton mRootDirectoryChooserButton;
+    private int mRowNum = 0;
 
-    private void add(JComponent comp, int x, int y, int fill) {
-        Container contentPane = this.getRootPane().getContentPane();
+    private void add(JComponent comp, int x, int fill) {
+        Container contentPane = getRootPane().getContentPane();
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = fill;
         constraints.weightx = 0.5;
         constraints.weighty = 0.5;
         constraints.gridx = x;
-        constraints.gridy = y;
+        constraints.gridy = mRowNum;
         contentPane.add(comp, constraints);
     }
 
-    private void add(JComponent comp, int x, int y) {
-        this.add(comp, x, y, GridBagConstraints.NONE);
+    private void add(JComponent comp, int x) {
+        add(comp, x, GridBagConstraints.NONE);
+    }
+
+    private void addRootDirectoryRow() {
+        add(new JLabel("Search Path:"), 0);
+        mRootDirectoryTextField = new JTextField("", 15);
+        add(mRootDirectoryTextField, 1, GridBagConstraints.HORIZONTAL);
+
+        mRootDirectoryChooserButton = new JButton("Select Directory");
+        add(mRootDirectoryChooserButton, 2);
+        mRowNum++;
+
+        mRootDirectoryErrorLabel.setForeground(Color.RED);
+        add(mRootDirectoryErrorLabel, 1);
+        mRowNum++;
+    }
+
+    public void addRootDirectoryChooserButtonListener(ActionListener listener) {
+        mRootDirectoryChooserButton.addActionListener(listener);
+    }
+
+    public void addRootDirectoryTextFieldListener(DocumentListener dl) {
+        mRootDirectoryTextField.getDocument().addDocumentListener(dl);
+    }
+
+    public void addFileExtensionsAllowedTextFieldListener(DocumentListener dl) {
+        mFileExtensionsAllowedTextField.getDocument().addDocumentListener(dl);
+    }
+
+    public void addSearchPatternTextFieldListener(DocumentListener dl) {
+        mSearchPatternTextField.getDocument().addDocumentListener(dl);
+    }
+
+    public String getRootDirectory() {
+        return mRootDirectoryTextField.getText();
+    }
+
+    public void setRootDirectory(String path) {
+        mRootDirectoryTextField.setText(path);
+    }
+
+    public String getSearchPattern() {
+        return mSearchPatternTextField.getText();
+    }
+
+    private void addSearchPatternRow() {
+        add(new JLabel("Search Pattern:"), 0);
+        mSearchPatternTextField = new JTextField("", 15);
+        add(mSearchPatternTextField, 1, GridBagConstraints.HORIZONTAL);
+        mRowNum++;
+
+        mSearchPatternErrorLabel.setForeground(Color.RED);
+        add(mSearchPatternErrorLabel, 1);
+        mRowNum++;
+    }
+
+    private void addOptionRows() {
+        // Include subdirectories
+        add(new JLabel("Include Subdirectories:"), 0);
+        mIncludeSubDirectoriesCheckBox = new JCheckBox();
+        add(mIncludeSubDirectoriesCheckBox, 1);
+        mRowNum++;
+
+        // Case insensitive
+        add(new JLabel("Case Insensitive:"), 0);
+        mCaseInsensitiveCheckBox = new JCheckBox();
+        add(mCaseInsensitiveCheckBox, 1);
+        mRowNum++;
+
+        // File extensions allowed
+        add(new JLabel("File extensions (e.g. \"txt, csv\")"), 0);
+        mFileExtensionsAllowedTextField = new JTextField("", 15);
+        add(mFileExtensionsAllowedTextField, 1);
+        mRowNum++;
+    }
+
+    public String getFileExtensionsAllowed() {
+        return mFileExtensionsAllowedTextField.getText();
+    }
+
+    public boolean getCaseInsensitive() {
+        return mCaseInsensitiveCheckBox.isSelected();
+    }
+
+    public boolean getIncludeSubDirectories() {
+        return mIncludeSubDirectoriesCheckBox.isSelected();
+    }
+
+    private void addStartSearchButton() {
+        add(mStartSearchButton, 1);
+        mRowNum++;
+    }
+
+    public void addIncludeSubDirectoriesCheckBoxListener(ActionListener al) {
+        this.mIncludeSubDirectoriesCheckBox.addActionListener(al);
+    }
+
+    public void addCaseInsensitiveCheckBoxListener(ActionListener al) {
+        this.mCaseInsensitiveCheckBox.addActionListener(al);
+    }
+
+    public void addStartSearchButtonListener(ActionListener al) {
+        this.mStartSearchButton.addActionListener(al);
+    }
+
+    public void setSearchPatternError(String error) {
+        mSearchPatternErrorLabel.setText(error);
+    }
+
+    public void setRootDirectory(File file) {
+        mRootDirectoryTextField.setText(file.getAbsolutePath());
+    }
+
+    public void setRootDirectoryError(String error) {
+        mRootDirectoryErrorLabel.setText(error);
     }
 
     public NewSearchDialog(Window owner) {
 
         super((Frame) owner, "New Search", Dialog.ModalityType.TOOLKIT_MODAL);
 
-        Container contentPane;
-        JLabel searchPathLabel = new JLabel("Search Path:");
-        JButton searchFileChooser;
-        JLabel searchStringLabel;
-        JLabel includeSubDirectoriesLabel;
+        mWindow = owner;
+        createRootPane();
+        getRootPane().getContentPane().setLayout(new GridBagLayout());
 
-        this.mWindow = owner;
-        this.createRootPane();
-        
-        contentPane = this.getRootPane().getContentPane();
-        contentPane.setLayout(new GridBagLayout());
+        addRootDirectoryRow();
+        addSearchPatternRow();
+        addOptionRows();
+        addStartSearchButton();
 
-        this.add(searchPathLabel, 0, 0);
+        pack();
+        setResizable(false);
+    }
 
-        this.mSearchPathTextField = new JTextField("", 15);
-        this.add(this.mSearchPathTextField, 1, 0, GridBagConstraints.HORIZONTAL);
+    public void ready() {
+        setVisible(true);
+    }
 
-        this.mSearchPathTextField.getDocument().addDocumentListener(new DocumentListener() {
-
-            public void changedUpdate(DocumentEvent e) {
-                //
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                //
-            }
-
-            public void insertUpdate(DocumentEvent e) {
-                //
-            }
-
-        });
-
-        this.mSearchPathErrorLabel = new JLabel("");
-        this.mSearchPathErrorLabel.setForeground(Color.RED);
-        this.add(this.mSearchPathErrorLabel, 1, 1);
-
-        searchFileChooser = new JButton("Select Directory");
-        this.add(searchFileChooser, 2, 0);
-        searchFileChooser.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e){
-                JFileChooser chooser = new JFileChooser();
-                chooser.setCurrentDirectory(new java.io.File("."));
-                chooser.setDialogTitle("Select a folder");
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                chooser.setAcceptAllFileFilterUsed(false);
-                if(chooser.showOpenDialog(NewSearchDialog.this) == JFileChooser.APPROVE_OPTION) {
-                    String path = chooser.getCurrentDirectory().getPath();
-                    // TODO Strip "." after the end of the path
-                    NewSearchDialog.this.mSearchPathTextField.setText(path);
-                }
-            }
-
-        });
-
-        searchStringLabel = new JLabel("Search String:");
-        this.add(searchStringLabel, 0, 2);
-
-        this.mSearchStringTextField = new JTextField("", 15);
-        this.add(this.mSearchStringTextField, 1, 2, GridBagConstraints.HORIZONTAL);
-
-        this.mSearchStringErrorLabel = new JLabel("");
-        this.mSearchStringErrorLabel.setForeground(Color.RED);
-        this.add(this.mSearchStringErrorLabel, 1, 3);
-
-        includeSubDirectoriesLabel = new JLabel("Include Subdirectories:");
-        this.add(includeSubDirectoriesLabel, 0, 4);
-
-        this.mIncludeSubDirectoriesCheckBox = new JCheckBox();
-        this.add(this.mIncludeSubDirectoriesCheckBox, 1, 4);
-
-        JLabel useRegularExpressionLabel = new JLabel("Use Regular Expressions:");
-        this.add(useRegularExpressionLabel, 0, 5);
-
-        this.mUseRegularExpressionCheckBox = new JCheckBox();
-        this.add(this.mUseRegularExpressionCheckBox, 1, 5);
-
-        JLabel caseInsensitiveLabel = new JLabel("Case Insensitive:");
-        this.add(caseInsensitiveLabel, 0, 6);
-
-        this.mCaseInsensitiveCheckBox = new JCheckBox();
-        this.add(this.mCaseInsensitiveCheckBox, 1, 6);
-
-        JButton newSearchButton = new JButton("Search");
-        this.add(newSearchButton, 1, 7);
-        newSearchButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                NewSearchDialog.this.mSearchPathErrorLabel.setText("");
-                NewSearchDialog.this.mSearchStringErrorLabel.setText("");
-                if(NewSearchDialog.this.mSearchPathTextField.getText().length() == 0){
-                    NewSearchDialog.this.mSearchPathErrorLabel.setText("Search path cannot be empty.");
-                } else if(NewSearchDialog.this.mSearchStringTextField.getText().length() == 0) {
-                    NewSearchDialog.this.mSearchStringErrorLabel.setText("Search string cannot be empty.");
-                } else {
-                    if(NewSearchDialog.this.mSearchPath.exists()) {
-                        Map optionMap = new HashMap();
-                        String searchString = NewSearchDialog.this.mSearchStringTextField.getText();
-                        Pattern searchPattern;
-                        optionMap.put("includeSubDirectories", NewSearchDialog.this.mIncludeSubDirectoriesCheckBox.isSelected());
-                        try {
-                            if(!NewSearchDialog.this.mUseRegularExpressionCheckBox.isSelected()) {
-                                searchString = Pattern.quote(searchString);
-                            }
-                            if(NewSearchDialog.this.mCaseInsensitiveCheckBox.isSelected()) {
-                                searchPattern = Pattern.compile(searchString, Pattern.CASE_INSENSITIVE);
-                            } else {
-                                searchPattern = Pattern.compile(searchString);
-                            }
-                            optionMap.put("searchString", searchString);
-                            optionMap.put("searchPattern", searchPattern);
-                            new ResultTabPanel(NewSearchDialog.this.mWindow, NewSearchDialog.this.mSearchPath, optionMap);
-                            NewSearchDialog.this.dispose();
-                        } catch(PatternSyntaxException patternException) {
-                            NewSearchDialog.this.mSearchPathErrorLabel.setText("Invalid regular expression.");
-                        }
-                    } else {
-                        NewSearchDialog.this.mSearchPathErrorLabel.setText("Search path not found.");
-                    }
-                }
-            }
-        });
-
-        this.pack();
-        this.setResizable(false);
-        this.setVisible(true);
-
+    public JFrame getOwner() {
+        return mWindow;
     }
 
 }

@@ -37,11 +37,8 @@ public class ResultTableModel extends AbstractTableModel {
     }
 
     public void addRow(String[] row) {
-        int rowCount = this.getRowCount() + 1;
         this.data.add(row);
-        this.fireTableCellUpdated(rowCount, 0);
-        this.fireTableCellUpdated(rowCount, 1);
-        this.fireTableCellUpdated(rowCount, 2);
+        this.fireTableDataChanged();
     }
 
 }
