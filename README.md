@@ -8,6 +8,7 @@ To Run
 * Make sure you have ant installed, then run in a terminal:
 
     ant clean compile jar
+
     ant run
 
 TODO
