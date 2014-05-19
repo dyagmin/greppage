@@ -18,6 +18,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JFileChooser;
 import javax.swing.SwingConstants;
@@ -74,6 +75,11 @@ public class ResultTabPanel extends JPanel {
     }
 
     public void complete() {
+        JTabbedPane parent = (JTabbedPane) getParent();
+        int i = parent.indexOfComponent(this);
+        if(i != -1) {
+            parent.setTitleAt(i, "Done");
+        }
         mSaveButton.setEnabled(true);
     }
 
