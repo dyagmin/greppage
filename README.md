@@ -7,14 +7,15 @@ To Run
 ------
 * Make sure you have ant installed, then run in a terminal:
 
+```
     ant clean compile jar
-
     ant run
+```
 
 TODO
 ----
 
-* Ability to exclude paths that contain x
-* Expand file extension part
-* Show more information on ResultTabPanel including files which were skipped due to errors
-* Add dialog with options for saving the file
+* Ability to exclude paths that contain x.
+* Expand file extension part.
+* Show more information on ResultTabPanel including files which were skipped due to errors.
+* Add ability to choose format file is saved.
