@@ -99,4 +99,8 @@ public class ResultTabPanel extends JPanel {
         mFilesErroredLabel.setText(String.format("%d files errored", filesErrored));
     }
 
+    public void addSaveResultsButtonListener(ActionListener listener) {
+        mSaveButton.addActionListener(listener);
+    }
+
 }
