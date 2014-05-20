@@ -3,10 +3,17 @@ package com.danielyagmin.greppage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import java.util.regex.PatternSyntaxException;
 
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
 import javax.swing.event.DocumentEvent;
@@ -18,9 +25,9 @@ import com.danielyagmin.greppage.SearchThreadListener;
 
 import com.danielyagmin.greppage.model.ResultTableModel;
 
-import com.danielyagmin.greppage.view.DirectoryChooser;
 import com.danielyagmin.greppage.view.ResultTabPanel;
 import com.danielyagmin.greppage.view.NewSearchDialog;
+import com.danielyagmin.greppage.view.SaveResultsDialog;
 import com.danielyagmin.greppage.view.Window;
 
 public class Greppage {
@@ -52,6 +59,7 @@ public class Greppage {
         SearchThread thread = new SearchThread(options);
         thread.setModel(model);
         mWindow.addResultTabPanel(resultTabPanel);
+        resultTabPanel.addSaveResultsButtonListener(new SaveResultsButtonListener(model));
 
         thread.addListener(new SearchThreadListener() {
 
@@ -101,12 +109,19 @@ public class Greppage {
 
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    DirectoryChooser chooser = new DirectoryChooser(dialog);
-                    try {
-                        options.setRootDirectory(chooser.getDirectory());
-                        dialog.setRootDirectory(options.getRootDirectory());
-                    } catch (FileNotFoundException fileException) {
-                        // TODO Improve
+                    JFileChooser chooser = new JFileChooser();
+                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    chooser.setDialogTitle("Select a Folder");
+                    chooser.setAcceptAllFileFilterUsed(false);
+                    chooser.setCurrentDirectory(options.getRootDirectory());
+                    if(chooser.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
+                        try {
+                            String path = chooser.getSelectedFile().toString();
+                            options.setRootDirectory(path);
+                            dialog.setRootDirectory(options.getRootDirectory());
+                        } catch (FileNotFoundException e) {
+                            dialog.setRootDirectoryError("Could not find directory.");
+                        }
                     }
                 }
             });
@@ -218,6 +233,97 @@ public class Greppage {
             final NewSearchDialog dialog = new NewSearchDialog(Greppage.this.mWindow);
             final Options options = new Options();
             addListeners(dialog, options);
+            dialog.ready();
+        }
+
+    }
+
+    class SaveResultsButtonListener implements ActionListener {
+
+        private ResultTableModel mModel;
+
+        public SaveResultsButtonListener(ResultTableModel model) {
+            mModel = model;
+        }
+
+        public void addListeners(final SaveResultsDialog dialog) {
+
+            dialog.addSavePathTextFieldListener(new DocumentListener() {
+
+                private void update() {
+                    // TODO Update any validation needed
+                }
+
+                public void changedUpdate(DocumentEvent e) {
+                    update();
+                }
+
+                public void removeUpdate(DocumentEvent e) {
+                    update();
+                }
+
+                public void insertUpdate(DocumentEvent e) {
+                    update();
+                }
+
+            });
+
+            dialog.addSaveAsButtonActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    JFileChooser chooser = new JFileChooser();
+                    chooser.setDialogTitle("Save As");
+                    chooser.setAcceptAllFileFilterUsed(false);
+                    chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                    chooser.setApproveButtonText("Save As");
+                    if(chooser.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
+                        String path = chooser.getSelectedFile().toString();
+                        dialog.setSavePath(path);
+                    }
+                }
+
+            });
+
+            dialog.addSaveButtonActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    Writer writer = null;
+                    File outputFile = new File(dialog.getSaveAs());
+                    try {
+                        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile)));
+                        for(int i = 0; i < mModel.getRowCount(); i++) {
+                            if(i > 0) {
+                             writer.write("\n");
+                            }
+                            for(int j = 0; j < mModel.getColumnCount(); j++) {
+                                if(j > 0) {
+                                    writer.write(",");
+                                }
+                                writer.write((String) mModel.getValueAt(i, j));
+                            }
+                        }
+                    } catch(IOException e) {
+                        // TODO Show error
+                    } finally {
+                        try {
+                            writer.close();
+                        } catch(Exception e) {
+                            // Nothing
+                        }
+                    }
+                    dialog.dispose();
+                }
+
+            });
+
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SaveResultsDialog dialog = new SaveResultsDialog(Greppage.this.mWindow);
+            addListeners(dialog);
             dialog.ready();
         }
 
