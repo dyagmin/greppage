@@ -9,13 +9,12 @@ import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.danielyagmin.greppage.view.DirectoryChooser;
 import com.danielyagmin.greppage.view.NewSearchDialog;
 
 
 class Options {
 
-    private File mRootDirectory;
+    private File mRootDirectory = new java.io.File(".");
     private Pattern mSearchPattern;
     private boolean mIncludeSubDirectories = false;
     private boolean mCaseInsensitive = false;
