@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import java.lang.StringBuilder;
+
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JFileChooser;
@@ -294,15 +296,21 @@ public class Greppage {
                     try {
                         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile)));
                         for(int i = 0; i < mModel.getRowCount(); i++) {
+                            StringBuilder sb = new StringBuilder();
                             if(i > 0) {
-                             writer.write("\n");
+                             sb.append("\n");
                             }
                             for(int j = 0; j < mModel.getColumnCount(); j++) {
                                 if(j > 0) {
-                                    writer.write(",");
+                                    sb.append(",");
                                 }
-                                writer.write((String) mModel.getValueAt(i, j));
+                                String s = (String) mModel.getValueAt(i, j);
+                                if(s.contains(",") || s.contains("\"")) {
+                                    s = String.format("\"%s\"", s);
+                                }
+                                sb.append(s);
                             }
+                            writer.write(sb.toString());
                         }
                     } catch(IOException e) {
                         // TODO Show error
