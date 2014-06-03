@@ -62,10 +62,10 @@ public class ResultTabPanel extends JPanel {
         addTable(model);
         mSaveButton = new JButton("Save");
         mSaveButton.setEnabled(false);
-        add(mFilesErroredLabel, 0, 1);
-        add(mFilesSearchedLabel, 1, 1);
-        add(mFilesSkippedLabel, 2, 1);
-        add(mOptionsLabel, 0, 2);
+        add(mOptionsLabel, 0, 1);
+        add(mFilesErroredLabel, 1, 1);
+        add(mFilesSearchedLabel, 0, 2);
+        add(mFilesSkippedLabel, 1, 2);
         add(mSaveButton, 1, 3);
     }
 
@@ -81,6 +81,10 @@ public class ResultTabPanel extends JPanel {
             parent.setTitleAt(i, "Done");
         }
         mSaveButton.setEnabled(true);
+    }
+
+    public void setOptionLabelText(String text) {
+        mOptionsLabel.setText(text);
     }
 
     public String getTitle() {
