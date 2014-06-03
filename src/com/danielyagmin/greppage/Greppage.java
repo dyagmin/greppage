@@ -61,6 +61,7 @@ public class Greppage {
         SearchThread thread = new SearchThread(options);
         thread.setModel(model);
         mWindow.addResultTabPanel(resultTabPanel);
+        resultTabPanel.setOptionLabelText(String.format("Searching for \"%s\" in \"%s\".", options.getSearchPattern().toString(), options.getRootDirectory().toString()));
         resultTabPanel.addSaveResultsButtonListener(new SaveResultsButtonListener(model));
 
         thread.addListener(new SearchThreadListener() {
