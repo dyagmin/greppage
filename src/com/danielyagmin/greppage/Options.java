@@ -50,7 +50,12 @@ class Options {
 
     public void setRootDirectory(String path) throws FileNotFoundException {
         if(path != null) {
-            mRootDirectory = new File(path);
+            File rootDirectory = new File(path);
+            if(rootDirectory.canRead()) {
+                mRootDirectory = rootDirectory;
+            } else {
+                throw new FileNotFoundException("Cannot read path.");
+            }
         }
     }
 
