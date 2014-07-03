@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 import java.io.File;
 
@@ -54,6 +55,8 @@ public class NewSearchDialog extends JDialog {
         constraints.weighty = 0.5;
         constraints.gridx = x;
         constraints.gridy = mRowNum;
+        constraints.insets = new Insets(5, 5, 5, 5);
+        constraints.anchor = GridBagConstraints.WEST;
         contentPane.add(comp, constraints);
     }
 
@@ -64,6 +67,7 @@ public class NewSearchDialog extends JDialog {
     private void addRootDirectoryRow() {
         add(new JLabel("Search Path:"), 0);
         mRootDirectoryTextField = new JTextField("", 15);
+        mRootDirectoryTextField.setMinimumSize(mRootDirectoryTextField.getPreferredSize());
         add(mRootDirectoryTextField, 1, GridBagConstraints.HORIZONTAL);
 
         mRootDirectoryChooserButton = new JButton("Select Directory");
@@ -106,6 +110,7 @@ public class NewSearchDialog extends JDialog {
     private void addSearchPatternRow() {
         add(new JLabel("Search Pattern:"), 0);
         mSearchPatternTextField = new JTextField("", 15);
+        mSearchPatternTextField.setMinimumSize(mSearchPatternTextField.getPreferredSize());
         add(mSearchPatternTextField, 1, GridBagConstraints.HORIZONTAL);
         mRowNum++;
 
@@ -130,6 +135,7 @@ public class NewSearchDialog extends JDialog {
         // File extensions allowed
         add(new JLabel("File extensions (e.g. \"txt, csv\")"), 0);
         mFileExtensionsAllowedTextField = new JTextField("", 15);
+        mFileExtensionsAllowedTextField.setMinimumSize(mFileExtensionsAllowedTextField.getPreferredSize());
         add(mFileExtensionsAllowedTextField, 1);
         mRowNum++;
     }
