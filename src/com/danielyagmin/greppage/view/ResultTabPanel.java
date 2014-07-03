@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 import java.io.File;
 
@@ -31,7 +32,6 @@ public class ResultTabPanel extends JPanel {
     private JLabel mFilesErroredLabel = new JLabel();
     private JLabel mFilesSearchedLabel = new JLabel();
     private JLabel mFilesSkippedLabel = new JLabel();
-    private JLabel mOptionsLabel = new JLabel();
     private JTable mTable;
 
     private void add(JComponent comp, int gridx, int gridy) {
@@ -41,6 +41,8 @@ public class ResultTabPanel extends JPanel {
         constraints.weighty = 0.1;
         constraints.gridx = gridx;
         constraints.gridy = gridy;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(5, 5, 5, 5);
         add(comp, constraints);
     }
 
@@ -62,11 +64,10 @@ public class ResultTabPanel extends JPanel {
         addTable(model);
         mSaveButton = new JButton("Save");
         mSaveButton.setEnabled(false);
-        add(mOptionsLabel, 0, 1);
-        add(mFilesErroredLabel, 1, 1);
-        add(mFilesSearchedLabel, 0, 2);
+        add(mFilesSearchedLabel, 0, 1);
+        add(mSaveButton, 1, 1);
+        add(mFilesErroredLabel, 0, 2);
         add(mFilesSkippedLabel, 1, 2);
-        add(mSaveButton, 1, 3);
     }
 
     public ResultTabPanel(ResultTableModel model) {
@@ -83,8 +84,12 @@ public class ResultTabPanel extends JPanel {
         mSaveButton.setEnabled(true);
     }
 
-    public void setOptionLabelText(String text) {
-        mOptionsLabel.setText(text);
+    public void setOptionsTexts(Map<String, String> optionsMap) {
+        int index = 3;
+        for(Map.Entry<String, String> entry : optionsMap.entrySet()) {
+            add(new JLabel(String.format("%s:", entry.getKey())), 0, index);
+            add(new JLabel(entry.getValue()), 1, index++);
+        }
     }
 
     public String getTitle() {
