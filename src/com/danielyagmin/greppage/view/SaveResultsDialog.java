@@ -1,10 +1,12 @@
 package com.danielyagmin.greppage.view;
 
 import java.awt.event.ActionListener;
+import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -16,7 +18,7 @@ import javax.swing.event.DocumentListener;
 public class SaveResultsDialog extends JDialog {
 
     private Window mWindow;
-    private JTextField mSaveAsTextField = new JTextField("");
+    private JTextField mSaveAsTextField = new JTextField("", 15);
     private JButton mSaveAsButton = new JButton("Save As...");
     private JLabel mSavePathErrorLabel = new JLabel("");
     private JButton mSaveButton = new JButton("Save");
@@ -28,8 +30,9 @@ public class SaveResultsDialog extends JDialog {
         constraints.weighty = 0.1;
         constraints.gridx = 0;
         constraints.gridy = 0;
+        constraints.insets = new Insets(5, 5, 5, 5);
         add(mSaveAsTextField, constraints);
-        mSaveAsTextField.setColumns(15);
+        mSaveAsTextField.setMinimumSize(mSaveAsTextField.getPreferredSize());
     }
 
     private void addSaveAsButton() {
@@ -39,6 +42,7 @@ public class SaveResultsDialog extends JDialog {
         constraints.weighty = 0.1;
         constraints.gridx = 1;
         constraints.gridy = 0;
+        constraints.insets = new Insets(5, 5, 5, 5);
         add(mSaveAsButton, constraints);
     }
 
@@ -49,6 +53,9 @@ public class SaveResultsDialog extends JDialog {
         constraints.weighty = 0.1;
         constraints.gridx = 0;
         constraints.gridy = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(5, 5, 5, 5);
+        mSavePathErrorLabel.setForeground(Color.RED);
         add(mSavePathErrorLabel, constraints);
     }
 
@@ -59,6 +66,7 @@ public class SaveResultsDialog extends JDialog {
         constraints.weighty = 0.1;
         constraints.gridx = 0;
         constraints.gridy = 2;
+        constraints.insets = new Insets(5, 5, 5, 5);
         add(mSaveButton, constraints);
     }
 
@@ -100,8 +108,8 @@ public class SaveResultsDialog extends JDialog {
         mSaveAsTextField.setText(path);
     }
 
-    public void setSavePathError(String path) {
-        mSavePathErrorLabel.setText(path);
+    public void setSavePathError(String error) {
+        mSavePathErrorLabel.setText(error);
     }
 
     public String getSaveAs() {
