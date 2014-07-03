@@ -13,6 +13,9 @@ import java.io.Writer;
 
 import java.lang.StringBuilder;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JFileChooser;
@@ -61,7 +64,12 @@ public class Greppage {
         SearchThread thread = new SearchThread(options);
         thread.setModel(model);
         mWindow.addResultTabPanel(resultTabPanel);
-        resultTabPanel.setOptionLabelText(String.format("Searching for \"%s\" in \"%s\".", options.getSearchPattern().toString(), options.getRootDirectory().toString()));
+
+        Map<String, String> optionsMap = new HashMap<String, String>();
+        optionsMap.put("Search Pattern", options.getSearchPattern().toString());
+        optionsMap.put("Search Path", options.getRootDirectory().toString());
+        resultTabPanel.setOptionsTexts(optionsMap);
+
         resultTabPanel.addSaveResultsButtonListener(new SaveResultsButtonListener(model));
 
         thread.addListener(new SearchThreadListener() {
@@ -207,11 +215,11 @@ public class Greppage {
             dialog.addRootDirectoryTextFieldListener(new DocumentListener() {
 
                 private void update() {
+                    dialog.setRootDirectoryError("");
                     try {
                         options.setRootDirectory(dialog.getRootDirectory());
-                        dialog.setRootDirectoryError("");
                     } catch(FileNotFoundException fileException) {
-                        dialog.setRootDirectoryError("Path not found.");
+                        dialog.setRootDirectoryError("Cannot read path.");
                     }
                 }
 
@@ -254,7 +262,12 @@ public class Greppage {
             dialog.addSavePathTextFieldListener(new DocumentListener() {
 
                 private void update() {
-                    // TODO Update any validation needed
+                    File file = new File(dialog.getSaveAs()).getParentFile();
+                    if(file == null || !file.canWrite()) {
+                        dialog.setSavePathError("Unwritable file path.");
+                    } else {
+                        dialog.setSavePathError("");
+                    }
                 }
 
                 public void changedUpdate(DocumentEvent e) {
@@ -276,10 +289,12 @@ public class Greppage {
                 @Override
                 public void actionPerformed(ActionEvent event) {
                     JFileChooser chooser = new JFileChooser();
+                    File file = new File(dialog.getSaveAs());
                     chooser.setDialogTitle("Save As");
                     chooser.setAcceptAllFileFilterUsed(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                     chooser.setApproveButtonText("Save As");
+                    chooser.setCurrentDirectory(file.getParentFile());
                     if(chooser.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
                         String path = chooser.getSelectedFile().toString();
                         dialog.setSavePath(path);
@@ -295,6 +310,7 @@ public class Greppage {
                     Writer writer = null;
                     File outputFile = new File(dialog.getSaveAs());
                     try {
+                        dialog.setSavePathError("");
                         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile)));
                         for(int i = 0; i < mModel.getRowCount(); i++) {
                             StringBuilder sb = new StringBuilder();
@@ -314,7 +330,7 @@ public class Greppage {
                             writer.write(sb.toString());
                         }
                     } catch(IOException e) {
-                        // TODO Show error
+                        dialog.setSavePathError("Could not save file.");
                     } finally {
                         try {
                             writer.close();
