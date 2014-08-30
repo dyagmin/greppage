@@ -3,15 +3,9 @@ package com.danielyagmin.greppage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-
-import java.lang.StringBuilder;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -295,7 +289,7 @@ public class Greppage {
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                     chooser.setApproveButtonText("Save As");
                     chooser.setCurrentDirectory(file.getParentFile());
-                    if(chooser.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
+                    if(chooser.showSaveDialog(dialog) == JFileChooser.APPROVE_OPTION) {
                         String path = chooser.getSelectedFile().toString();
                         dialog.setSavePath(path);
                     }
@@ -307,36 +301,13 @@ public class Greppage {
 
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    Writer writer = null;
                     File outputFile = new File(dialog.getSaveAs());
+                    SearchResultsCSVWriter writer = new SearchResultsCSVWriter(outputFile);
+                    dialog.setSavePathError("");
                     try {
-                        dialog.setSavePathError("");
-                        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile)));
-                        for(int i = 0; i < mModel.getRowCount(); i++) {
-                            StringBuilder sb = new StringBuilder();
-                            if(i > 0) {
-                             sb.append("\n");
-                            }
-                            for(int j = 0; j < mModel.getColumnCount(); j++) {
-                                if(j > 0) {
-                                    sb.append(",");
-                                }
-                                String s = (String) mModel.getValueAt(i, j);
-                                if(s.contains(",") || s.contains("\"")) {
-                                    s = String.format("\"%s\"", s);
-                                }
-                                sb.append(s);
-                            }
-                            writer.write(sb.toString());
-                        }
+                        writer.write(mModel);
                     } catch(IOException e) {
                         dialog.setSavePathError("Could not save file.");
-                    } finally {
-                        try {
-                            writer.close();
-                        } catch(Exception e) {
-                            // Nothing
-                        }
                     }
                     dialog.dispose();
                 }
