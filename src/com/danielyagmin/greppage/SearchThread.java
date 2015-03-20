@@ -8,13 +8,7 @@ import java.io.IOException;
 
 import java.lang.Thread;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-
-import com.danielyagmin.greppage.Options;
-import com.danielyagmin.greppage.SearchThreadListener;
 
 import com.danielyagmin.greppage.model.ResultTableModel;
 
@@ -29,10 +23,10 @@ public class SearchThread extends Thread {
 
     public SearchThread(Options options) {
         super();
-        mRootDirectory = options.getRootDirectory();
-        mSearchPattern = options.getSearchPattern();
-        mIncludeSubDirectories = options.getIncludeSubDirectories();
-        mFileExtensionsAllowed = options.getFileExtensionsAllowed();
+        mRootDirectory = options.rootDirectory;
+        mSearchPattern = options.searchPattern;
+        mIncludeSubDirectories = options.includeSubDirectories;
+        mFileExtensionsAllowed = options.fileExtensionsAllowed;
     }
 
     public void addListener(SearchThreadListener listener) {
